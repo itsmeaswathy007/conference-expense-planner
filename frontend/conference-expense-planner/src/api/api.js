@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:4000"; // Change this to your backend URL
+const BASE_URL = "http://localhost:4000"; 
 
 // Login with OTP
 export const loginWithOTP = async (email, otp) => {

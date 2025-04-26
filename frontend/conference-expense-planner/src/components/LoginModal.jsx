@@ -38,36 +38,49 @@ const LoginModal = ({ show, handleClose }) => {
     }
   };
 
-  // **Handle Login (Password or OTP)**
-  const handleLogin = async () => {
-    try {
-      setLoading(true);
-      const endpoint = showOtpField
-        ? "http://localhost:4000/api/auth/verify-otp"
-        : "http://localhost:4000/api/auth/login";
+ // **Handle Login (Password or OTP)**
+const handleLogin = async () => {
+  try {
+    setLoading(true);
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(showOtpField ? { email, otp } : { email, password }),
-      });
+    const endpoint = showOtpField
+      ? "http://localhost:4000/api/auth/verify-otp"
+      : "http://localhost:4000/api/auth/login";
 
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role || "customer");
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(showOtpField ? { email, otp } : { email, password }),
+    });
 
-        window.location.href = data.role === "admin" ? "/admin" : "/products";
-      } else {
-        alert(data.message || "Login failed!");
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      alert("Something went wrong!");
-    } finally {
-      setLoading(false);
+    const data = await response.json();
+
+    if (response.ok) {
+      // ✅ Store individual values (optional)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role || "customer");
+
+      // ✅ Store user object (required by ProductPage to show name)
+      const user = {
+        name: data.name,
+        email: email,
+        role: data.role || "customer"
+      };
+      localStorage.setItem("user", JSON.stringify(user)); // <-- Required for ProductPage
+
+      // ✅ Redirect
+      window.location.href = data.role === "admin" ? "/admin" : "/products";
+    } else {
+      alert(data.message || "Login failed!");
     }
-  };
+  } catch (error) {
+    console.error("Error during login:", error);
+    alert("Something went wrong!");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // **Handle Signup**
   const handleSignup = async () => {

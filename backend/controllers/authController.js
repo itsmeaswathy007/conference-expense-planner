@@ -79,10 +79,10 @@ const login = async (req, res) => {
 
         // Generate JWT Token
         //const token = generateToken(user._id);
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user._id, role: user.role, }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
 
-        res.status(200).json({ message: "Login successful", token, role:user.role });
+        res.status(200).json({ message: "Login successful", token, role:user.role, name:user.name });
     } catch (error) {
         res.status(500).json({ message: "Login failed", error: error.message });
     }
@@ -144,4 +144,14 @@ const verifyOTP = async (req, res) => {
     }
 };
 
-module.exports = { signup, login, sendOTP, verifyOTP };
+// Get user count
+const getUserCount = async (req, res) => {
+    try {
+      const count = await User.countDocuments();
+      res.status(200).json({ count });
+    } catch (err) {
+      res.status(500).json({ message: "Failed to get user count" });
+    }
+  };
+
+module.exports = { signup, login, sendOTP, verifyOTP,getUserCount };
